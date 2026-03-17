@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using webapi.Models;
 
 namespace webapi.Controllers;
@@ -9,11 +10,13 @@ public class ActivityController : ControllerBase
 {
     private TestContext _db;
     private LeaderboardService _leaderboardService;
+    private IMemoryCache _cache;
 
-    public ActivityController(TestContext db, LeaderboardService leaderboardService)
+    public ActivityController(TestContext db, LeaderboardService leaderboardService, IMemoryCache cache)
     {
         _db = db;
         _leaderboardService = leaderboardService;
+        _cache = cache;
     }
 
     [HttpGet]
@@ -78,6 +81,9 @@ public class ActivityController : ControllerBase
         _db.PlayerActivities.Add(activity);
         _db.SaveChanges();
 
+        //invalidated cache
+        _cache.Remove("LeaderBoardCache");
+
         return Ok(activity);
     }
 
@@ -85,9 +91,9 @@ public class ActivityController : ControllerBase
     {
         error = "";
 
-        if (activity.PlayerId.Length != Guid.NewGuid().ToString().Length)
+        if (!Guid.TryParse(activity.PlayerId, out _))
         {
-            error = "Player ID was not a valid UUID.";
+            error = "Player ID was not a valid GUID.";
             return false;
         }
 

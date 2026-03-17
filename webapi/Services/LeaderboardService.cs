@@ -29,16 +29,14 @@ public class LeaderboardService : ILeaderboardService
 
     public List<PlayerDetails> GetPlayerDetailsWithScore()
     {
-        List<PlayerDetails> results = new();
+        var result = _db.PlayerDetails
+            .Select(player => new PlayerDetails(player.Uuid, player.Name, _db.PlayerActivities
+                    .Where(a => a.PlayerId == player.Uuid && a.LogType == ActivityLogType.EARNED_POINTS)
+                    .Sum(a => (int?)int.Parse(a.Data)) ?? 0))
+            .OrderByDescending(p => p.Score)
+            .ToList();
 
-        var playerList = _db.PlayerDetails.ToList();
-        foreach (var player in playerList)
-        {
-            player.Score = GetPlayerScore(player.Uuid, DateTime.MinValue, DateTime.MaxValue);
-            results.Add(player);
-        }
-        results = results.OrderByDescending(p => p.Score).ToList();
-        return results;
+        return result;
     }
 
     private int SumScore(List<PlayerActivity> activities)
