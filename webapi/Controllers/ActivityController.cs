@@ -107,9 +107,9 @@ public class ActivityController : ControllerBase
         }
         if (activity.LogType == Enums.ActivityLogType.RECEIVED_REWARD || activity.LogType == Enums.ActivityLogType.STARTED_CRAFTING)
         {
-            if (activity.Data.Length != Guid.NewGuid().ToString().Length)
+            if (!Guid.TryParse(activity.Data, out _))
             {
-                error = "ItemId was not a valid ID";
+                error = "ItemId was not a valid GUID";
                 return false;
             }
         }

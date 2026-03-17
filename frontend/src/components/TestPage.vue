@@ -49,7 +49,7 @@
 <script lang="js" setup>
     import { ref, watch } from 'vue';
     import axios from 'axios';
-    const err = ref("");;
+    const err = ref("");
     const success = ref(false);
 
     const formData = ref({
@@ -81,7 +81,8 @@
     async function sendAddLog() {
         formData.value.logType = parseInt(formData.value.logType);
         try {
-            const response = await axios.post('https://localhost:7196/Activity/AddActivity', formData.value, { headers: { 'Content-Type': 'application/json' } });
+            const response = await axios.post('http://localhost:5292/Activity/AddActivity', formData.value, { headers: { 'Content-Type': 'application/json' } });
+            response.value
             err.value = "";
             success.value = true;
         } catch (error) {
@@ -98,7 +99,7 @@
     }
     function sendAddPlayer() {
         try {
-            axios.post("https://localhost:7196/Player/Create/", playerName.value,{ headers: { 'Content-Type': 'application/json' } });
+            axios.post("http://localhost:5292/Player/Create/", playerName.value,{ headers: { 'Content-Type': 'application/json' } });
             err.value = "";
             success.value = true;
         } catch (error) {

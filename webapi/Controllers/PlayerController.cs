@@ -44,13 +44,13 @@ public class PlayerController : ControllerBase
     [Route("GetLeaderboard")]
     public ActionResult<List<PlayerDetails>> GetLeaderboard()
     {
-        // Try to get the leaderboard from cache
+        //try get leaderboard from cache
         if (!_cache.TryGetValue(LeaderboardCacheKey, out List<PlayerDetails> leaderboard))
         {
-            // If it's not in the cache, fetch it from your service
+            //if not cached fetch from service
             leaderboard = _leaderboardService.GetPlayerDetailsWithScore();
 
-            // Set the leaderboard in the cache with a sliding expiration of 1 minute
+            //cache it with expiration of 1 min
             _cache.Set(LeaderboardCacheKey, leaderboard, TimeSpan.FromMinutes(1));
         }
 
@@ -69,6 +69,9 @@ public class PlayerController : ControllerBase
         PlayerDetails playerDetail = new PlayerDetails(name, Guid.NewGuid().ToString());
         _db.PlayerDetails.Add(playerDetail);
         _db.SaveChanges();
+
+        //invalidate cache
+        _cache.Remove("LeaderBoardCache");
 
         return Ok(playerDetail);
     }

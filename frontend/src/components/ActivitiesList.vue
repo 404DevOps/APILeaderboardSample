@@ -25,15 +25,18 @@
                         <th></th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr v-if="activities.length > 0" v-for="activity in activities" :key="activity.id">
+                <tbody v-if="activities.length > 0" >
+                    <tr v-for="activity in activities" :key="activity.id">
                         <td>{{ activity.id }}</td>
                         <td>{{ new Date(activity.date).toLocaleString() }}</td>
                         <td>{{ getLogTypeString(activity.logType) }}</td>
                         <td>{{ activity.playerId }}</td>
                         <td>{{ activity.data }}</td>
                     </tr>
-                    <tr v-else>
+
+                </tbody>
+                <tbody v-else>
+                     <tr>
                         <td colspan="5">No PlayerActivities found.</td>
                     </tr>
                 </tbody>

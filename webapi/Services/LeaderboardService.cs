@@ -29,10 +29,20 @@ public class LeaderboardService : ILeaderboardService
 
     public List<PlayerDetails> GetPlayerDetailsWithScore()
     {
-        var result = _db.PlayerDetails
-            .Select(player => new PlayerDetails(player.Uuid, player.Name, _db.PlayerActivities
-                    .Where(a => a.PlayerId == player.Uuid && a.LogType == ActivityLogType.EARNED_POINTS)
-                    .Sum(a => (int?)int.Parse(a.Data)) ?? 0))
+        var activities = _db.PlayerActivities.Where(a => a.LogType == ActivityLogType.EARNED_POINTS)
+                                             .Select(a => new { a.PlayerId, a.Data })
+                                             .ToList();
+
+        var scores = activities.GroupBy(a => a.PlayerId)
+                                .ToDictionary(
+                                    g => g.Key,
+                                    g => g.Sum(a => int.TryParse(a.Data, out var val) ? val : 0)
+                                );
+
+        var players = _db.PlayerDetails.ToList();
+
+        var result = players
+            .Select(p => new PlayerDetails(p.Name, p.Uuid, scores.ContainsKey(p.Uuid) ? scores[p.Uuid] : 0))
             .OrderByDescending(p => p.Score)
             .ToList();
 

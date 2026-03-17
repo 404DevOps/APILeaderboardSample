@@ -43,13 +43,13 @@
     async function getName() {
         playerName.value = '';
 
-        const response = await axios.get('https://localhost:7196/Player/' + uuid.value).catch(function (error) { err.value = error; return; });
+        const response = await axios.get('http://localhost:5292/Player/' + uuid.value).catch(function (error) { err.value = error; return; });
         playerName.value = response.data.name;
         err.value = "";
     }
     async function getScore() {
         score.value = 0;
-        const response = await axios.get('https://localhost:7196/Activity/GetScore/', {
+        const response = await axios.get('http://localhost:5292/Activity/GetScore/', {
             params: {
                 playerId: uuid.value,
                 fromDate: fromDate.value ? fromDate.value : null,
